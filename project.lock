@@ -1,0 +1,111 @@
+extract:
+  cmd: python -m spacy run extract
+  script:
+    - tar xf assets/ud-treebanks-v2.5.tgz -C assets/
+  deps:
+    - path: assets/ud-treebanks-v2.5.tgz
+      md5: 388456892760ada0db8e20ce58501025
+  outs:
+    - path: assets/ud-treebanks-v2.5/
+      md5: b958c614478bf1e3d706ec14a07364a1
+  spacy_version: 3.2.2
+  spacy_git_version: bbaf41fb3
+convert:
+  cmd: python -m spacy run convert
+  script:
+    - mkdir -p corpus/UDL1L2e_combined
+    - mkdir -p corpus/UDL1L2e_combined/pos
+    - python -m spacy convert assets/pos/UDL1L2e_combined-pos-train.conllu corpus/UDL1L2e_combined/pos/
+      --converter conllu2 -n 10 -T
+    - python -m spacy convert assets/pos/UDL1L2e_combined-pos-dev.conllu corpus/UDL1L2e_combined/pos/
+      --converter conllu2 -n 10 -T
+    - python -m spacy convert assets/pos/UDL1L2e_combined-pos-test.conllu corpus/UDL1L2e_combined/pos/
+      --converter conllu2 -n 10 -T
+    - mv corpus/UDL1L2e_combined/pos/UDL1L2e_combined-pos-train.spacy corpus/UDL1L2e_combined/pos/train.spacy
+    - mv corpus/UDL1L2e_combined/pos/UDL1L2e_combined-pos-dev.spacy corpus/UDL1L2e_combined/pos/dev.spacy
+    - mv corpus/UDL1L2e_combined/pos/UDL1L2e_combined-pos-test.spacy corpus/UDL1L2e_combined/pos/test.spacy
+  deps: []
+  outs:
+    - path: corpus/UDL1L2e_combined/pos/train.spacy
+      md5: 8b6a71f275c3d9ff8278fefcb6102e8d
+    - path: corpus/UDL1L2e_combined/pos/dev.spacy
+      md5: 5888c9bdaa1f92292a63a25c802576c4
+    - path: corpus/UDL1L2e_combined/pos/test.spacy
+      md5: 2af30fe6378f8ed0a964797d58403643
+  spacy_version: 3.2.2
+  spacy_git_version: bbaf41fb3
+generate-config:
+  cmd: python -m spacy run generate-config
+  script:
+    - python -m spacy init config -l en -p morphologizer,tagger,parser -o accuracy
+      configs/UD_English-EWT.cfg
+  deps: []
+  outs:
+    - path: configs/UD_English-EWT.cfg
+      md5: 5454ae9366b7fe7d6a00aa4ec5264e56
+  spacy_version: 3.2.2
+  spacy_git_version: bbaf41fb3
+train:
+  cmd: python -m spacy run train
+  script:
+    - python -m spacy train configs/pos/t2v.cfg -o training/pos_UDL1L2e_combined_t2v
+      --gpu-id -1 --paths.train corpus/UDL1L2e_combined/pos/train.spacy --paths.dev
+      corpus/UDL1L2e_combined/pos/dev.spacy
+  deps:
+    - path: corpus/UDL1L2e_combined/pos/train.spacy
+      md5: 8b6a71f275c3d9ff8278fefcb6102e8d
+    - path: corpus/UDL1L2e_combined/pos/dev.spacy
+      md5: 5888c9bdaa1f92292a63a25c802576c4
+    - path: configs/pos/t2v.cfg
+      md5: 1f66a3604f69e5785fd5982ab1b2df69
+  outs:
+    - path: training/pos_UDL1L2e_combined_t2v/model-best
+      md5: c8e3307e53fbe4bc92d583b21fcb2db8
+  spacy_version: 3.2.2
+  spacy_git_version: bbaf41fb3
+evaluate:
+  cmd: python -m spacy run evaluate
+  script:
+    - python -m spacy evaluate ./training/ud_L1L2e_combined_t2v/model-best ./corpus/L1L2e_combined/ud/test.spacy
+      --output ./metrics/ud_L1L2e_combined_t2v.json --gpu-id -1
+  deps:
+    - path: training/ud_L1L2e_combined_t2v/model-best
+      md5: d3e9837e84fd636d78301c08dfda3552
+    - path: corpus/L1L2e_combined/ud/test.spacy
+      md5: 999ca27c100ae63649657785dbd2981d
+  outs:
+    - path: metrics/ud_L1L2e_combined_t2v.json
+      md5: c98889b324c3ab9178a3380bfa4f82f3
+  spacy_version: 3.2.2
+  spacy_git_version: bbaf41fb3
+package:
+  cmd: python -m spacy run package
+  script:
+    - python -m spacy package training/pos_UDL1L2e_combined_t2v/model-best packages
+      --name pos_UDL1L2e_combined_t2v --version 0.0.1 --force
+  deps:
+    - path: training/pos_UDL1L2e_combined_t2v/model-best
+      md5: c8e3307e53fbe4bc92d583b21fcb2db8
+  outs:
+    - path: packages/pos_UDL1L2e_combined_t2v-0.0.1/dist/pos_UDL1L2e_combined_t2v-0.0.1.tar.gz
+      md5: null
+  spacy_version: 3.2.2
+  spacy_git_version: bbaf41fb3
+train-with-vectors:
+  cmd: python -m spacy run train-with-vectors
+  script:
+    - python -m spacy train configs/UD_English-EWT2.cfg -o training2/UD_English-EWT
+      --paths.train corpus/UD_English-EWT/train.spacy --paths.dev corpus/UD_English-EWT/dev.spacy
+      --training.max_steps=0 --initialize.vectors=null
+  deps:
+    - path: corpus/UD_English-EWT/train.spacy
+      md5: 1c5b2ff040a063a3f4b59b0c91d4ceae
+    - path: corpus/UD_English-EWT/dev.spacy
+      md5: 2ae7f5934c56815d281ca25e025eee8a
+    - path: configs/UD_English-EWT.cfg
+      md5: 5454ae9366b7fe7d6a00aa4ec5264e56
+  outs:
+    - path: training/UD_English-EWT/model-best
+      md5: null
+  spacy_version: 3.2.2
+  spacy_git_version: bbaf41fb3

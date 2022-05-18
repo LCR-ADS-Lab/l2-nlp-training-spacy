@@ -1,0 +1,109 @@
+title: "L2-NLP spaCy pipeline"
+description: "This is a project used to train spaCy models for L2-NLP project (Kyle et al., 2022). "
+
+# Variables can be referenced across the project.yml using ${vars.var_name}
+vars:
+  config: "trf" #Choose from "t2v" or "trf"; set config file each time you train model
+  ud_treebank: "UD_English-EWT"
+  ud_prefix: "L1L2e_combined" #dataset name: L1, L1L2_combined, L1L2e_combined
+  pipeline: "ud" #ud for POS + DEP; pos for POS only.
+  spacy_lang: "en" 
+  # spacy model with vectors by name or path: "en_core_web_lg"
+  # if used, switch from train to train-with-vectors
+  vectors: null
+  gpu: 0 #we don't use GPU, if you have GPU device with cuda, set 1
+  package_version: "0.0.1"
+
+# These are the directories that the project needs. The project CLI will make
+# sure that they always exist.
+directories: ["assets", "training", "metrics", "configs", "packages"]
+
+workflows:
+  all:
+    #- convert
+    - train
+    #- train-with-vectors
+    #- evaluate
+    - package
+
+commands:
+  - name: convert
+    help: "Convert the data to spaCy's format"
+    script:
+      - "mkdir -p corpus/${vars.ud_prefix}"
+      - "mkdir -p corpus/${vars.ud_prefix}/${vars.pipeline}"
+      - "python -m spacy convert assets/${vars.pipeline}/${vars.ud_prefix}-${vars.pipeline}-train.conllu corpus/${vars.ud_prefix}/${vars.pipeline}/ --converter conllu2 -n 10 -T"
+      - "python -m spacy convert assets/${vars.pipeline}/${vars.ud_prefix}-${vars.pipeline}-dev.conllu corpus/${vars.ud_prefix}/${vars.pipeline}/ --converter conllu2 -n 10 -T"
+      - "python -m spacy convert assets/${vars.pipeline}/${vars.ud_prefix}-${vars.pipeline}-test.conllu corpus/${vars.ud_prefix}/${vars.pipeline}/ --converter conllu2 -n 10 -T"
+      - "mv corpus/${vars.ud_prefix}/${vars.pipeline}/${vars.ud_prefix}-${vars.pipeline}-train.spacy corpus/${vars.ud_prefix}/${vars.pipeline}/train.spacy"
+      - "mv corpus/${vars.ud_prefix}/${vars.pipeline}/${vars.ud_prefix}-${vars.pipeline}-dev.spacy corpus/${vars.ud_prefix}/${vars.pipeline}/dev.spacy"
+      - "mv corpus/${vars.ud_prefix}/${vars.pipeline}/${vars.ud_prefix}-${vars.pipeline}-test.spacy corpus/${vars.ud_prefix}/${vars.pipeline}/test.spacy"
+    #deps:
+    #  - "assets/ud-treebanks-v2.9/"
+    outputs:
+      - "corpus/${vars.ud_prefix}/${vars.pipeline}/train.spacy"
+      - "corpus/${vars.ud_prefix}/${vars.pipeline}/dev.spacy"
+      - "corpus/${vars.ud_prefix}/${vars.pipeline}/test.spacy"
+
+  - name: train
+    help: "Train without vectors"
+    script:
+      - "python -m spacy train configs/${vars.pipeline}/${vars.config}.cfg -o training/${vars.pipeline}_${vars.ud_prefix}_${vars.config} --gpu-id ${vars.gpu} --paths.train corpus/${vars.ud_prefix}/${vars.pipeline}/train.spacy --paths.dev corpus/${vars.ud_prefix}/${vars.pipeline}/dev.spacy"
+      #- "python -m spacy train configs/${vars.treebank}.cfg -o training/${vars.treebank} --gpu-id ${vars.gpu} --paths.train corpus/${vars.treebank}/train.spacy --paths.dev corpus/${vars.treebank}/dev.spacy --training.max_steps=0 --initialize.vectors=null --components.tok2vec.model.embed.include_static_vectors=false"
+    deps:
+      - "corpus/${vars.ud_prefix}/${vars.pipeline}/train.spacy"
+      - "corpus/${vars.ud_prefix}/${vars.pipeline}/dev.spacy"
+      - "configs/${vars.pipeline}/${vars.config}.cfg"
+    outputs:
+      - "training/${vars.pipeline}_${vars.ud_prefix}_${vars.config}/model-best"
+
+  - name: train-with-vectors
+    help: "Train with vectors"
+    script:
+      - "python -m spacy train configs/${vars.pipeline}/${vars.config}.cfg -o training/${vars.pipeline}_${vars.ud_prefix}_${vars.config} --paths.train corpus/${vars.ud_prefix}/${vars.pipeline}/train.spacy --paths.dev corpus/${vars.ud_prefix}/${vars.pipeline}/dev.spacy --training.max_steps=0 --initialize.vectors=${vars.vectors}"
+    deps:
+      - "corpus/${vars.ud_prefix}/${vars.pipeline}/train.spacy"
+      - "corpus/${vars.ud_prefix}/${vars.pipeline}/dev.spacy"
+      - "configs/${vars.pipeline}/${vars.config}.cfg"
+    outputs:
+      - "training/${vars.pipeline}_${vars.ud_prefix}_${vars.config}/model-best"
+
+  - name: evaluate
+    help: "Evaluate on the test data and save the metrics"
+    script:
+      - "python -m spacy evaluate ./training/${vars.pipeline}_${vars.ud_prefix}_${vars.config}/model-best ./corpus/${vars.ud_prefix}/${vars.pipeline}/test.spacy --output ./metrics/${vars.pipeline}_${vars.ud_prefix}_${vars.config}.json --gpu-id ${vars.gpu}"
+    deps:
+      - "training/${vars.pipeline}_${vars.ud_prefix}_${vars.config}/model-best"
+      - "corpus/${vars.ud_prefix}/${vars.pipeline}/test.spacy"
+    outputs:
+      - "metrics/${vars.pipeline}_${vars.ud_prefix}_${vars.config}.json"
+
+
+#  - name: evaluate
+#    help: "Evaluate on the test data and save the metrics"
+#    script:
+#      # not on GPU because you'd need to handle batching for treebanks withouts
+#      # paragraph breaks
+#      - "python scripts/evaluate.py training/${vars.pipeline}-${vars.ud_prefix}-${vars.config}/model-best assets/${vars.pipeline}/${vars.ud_prefix}-${vars.pipeline}-test.conllu --output metrics/${vars.treebank}.txt --text assets/${vars.pipeline}/${vars.ud_prefix}-${vars.pipeline}-test.txt"
+#    deps:
+#      - "training/${vars.pipeline}-${vars.ud_prefix}-${vars.config}/model-best"
+#      #- "assets/${vars.pipeline}/${vars.ud_prefix}-${vars.pipeline}-test.conllu"
+#      #- "assets/${vars.pipeline}/${vars.ud_prefix}-${vars.pipeline}-test.txt"
+#    outputs:
+#      - "metrics/${vars.pipeline}-${vars.ud_prefix}-${vars.config}.txt"
+
+  - name: package
+    help: "Package the trained model so it can be installed"
+    script:
+      - "python -m spacy package training/${vars.pipeline}_${vars.ud_prefix}_${vars.config}/model-best packages --name ${vars.pipeline}_${vars.ud_prefix}_${vars.config} --version ${vars.package_version} --force"
+    deps:
+      - "training/${vars.pipeline}_${vars.ud_prefix}_${vars.config}/model-best"
+    outputs_no_cache:
+      - "packages/${vars.pipeline}_${vars.ud_prefix}_${vars.config}-${vars.package_version}/dist/${vars.pipeline}_${vars.ud_prefix}_${vars.config}-${vars.package_version}.tar.gz"
+
+  - name: clean
+    help: "Remove intermediate files"
+    script:
+      - "rm -rf training/*"
+      - "rm -rf metrics/*"
+      - "rm -rf corpus/*"
