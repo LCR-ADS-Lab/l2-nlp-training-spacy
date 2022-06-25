@@ -3,7 +3,8 @@ assets/pos/*-dev.conllu
 assets/pos/*-test.conllu
 assets/ud/*-train.conllu
 assets/ud/*-dev.conllu
-assets/ud/*-test.conllucorpus/L1_combined/pos/*
+assets/ud/*-test.conllu
+corpus/L1_combined/pos/*
 corpus/L1_combined/ud/*
 corpus/L1L2_combined/pos/*
 corpus/L1L2_combined/ud/*
