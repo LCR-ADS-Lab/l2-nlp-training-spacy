@@ -3,15 +3,15 @@ description: "This is a project used to train spaCy models for L2-NLP project (K
 
 # Variables can be referenced across the project.yml using ${vars.var_name}
 vars:
-  config: "trf" #Choose from "t2v" or "trf"; set config file each time you train model
+  config: "t2v" #Choose from "t2v" or "trf"; set config file each time you train model
   ud_treebank: "UD_English-EWT"
   ud_prefix: "L1L2e_combined" #dataset name: L1, L1L2_combined, L1L2e_combined
-  pipeline: "ud" #ud for POS + DEP; pos for POS only.
+  pipeline: "pos" #ud for POS + DEP; pos for POS only.
   spacy_lang: "en" 
   # spacy model with vectors by name or path: "en_core_web_lg"
   # if used, switch from train to train-with-vectors
   vectors: null
-  gpu: 0 #we don't use GPU, if you have GPU device with cuda, set 1
+  gpu: -1 #we don't use GPU, if you have GPU device with cuda, set 1
   package_version: "0.0.1"
 
 # These are the directories that the project needs. The project CLI will make

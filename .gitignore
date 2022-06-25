@@ -1,6 +1,9 @@
-assets/pos/*
-assets/ud/*
-corpus/L1_combined/pos/*
+assets/pos/*-train.conllu
+assets/pos/*-dev.conllu
+assets/pos/*-test.conllu
+assets/ud/*-train.conllu
+assets/ud/*-dev.conllu
+assets/ud/*-test.conllucorpus/L1_combined/pos/*
 corpus/L1_combined/ud/*
 corpus/L1L2_combined/pos/*
 corpus/L1L2_combined/ud/*
@@ -8,3 +11,4 @@ corpus/L1L2e_combined/pos/*
 corpus/L1L2e_combined/ud/*
 corpus/UDL1L2e_combined/pos/*
 .DS_Store
+training/*
