@@ -5,11 +5,11 @@ This repo contains necessary codes to train a series of spaCy models in Kyle et 
 The current repo uses [spacy ud_benchmark project](https://github.com/explosion/projects/tree/v3/benchmarks/ud_benchmark) as a template.
 
 
-# Prerequisite
+## Prerequisite
 - Python
 - spaCy version 3
 
-# Getting the training corpus
+## Getting the training corpus
 - TBA 
 
 # Steps to reproduce the result
