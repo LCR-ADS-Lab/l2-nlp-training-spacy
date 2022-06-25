@@ -66,10 +66,14 @@ python -m spacy project run all
 
 This will create a specific directory under `training` folder. When the training step is completed, it will also create spacy package under the `package` folder. 
 
-In the paper, we did not use `evaluate` command from spacy, but we create a separate script to evaluate the parsers accuracy using our own evaluation script.
+In the paper, we did not use `evaluate` command from spacy, but we created a separate script to evaluate the parsers accuracy using our own evaluation script (which is accessible under `zzz_eval_script`).
+
+## Evaluate trained pipelines
+
+TBA
 
 
-## TO DO list
+# TO DO list
 - [x] Add more description on this readme.
 - [ ] Check reproducibility
 - [ ] Add more description on evaluation script 
