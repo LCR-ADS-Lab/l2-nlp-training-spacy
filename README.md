@@ -5,24 +5,20 @@ This repo contains necessary codes to train a series of spaCy models in Kyle et 
 The current repo uses [spacy ud_benchmark project](https://github.com/explosion/projects/tree/v3/benchmarks/ud_benchmark) as a template.
 
 
-## TO DO list
-- [ ] Add more description on this readme.
-- [ ] 
-
-## Prerequisite
+# Prerequisite
 - Python
 - spaCy version 3
 
-## Getting the training corpus
-- TBA
+# Getting the training corpus
+- TBA 
 
-## Steps to reproduce the result
+# Steps to reproduce the result
 Please follow the following steps to reproduce our result on the paper.
 
-### Put the corpus file under `asset` folder
+## Put the corpus file under `asset` folder
 Once you obtained the training corpus files in  `.connlu` format, put them under `asset/ud` and `asset/pos` respectively. Spacy project commands will recognize these `conllu` files when prompted and convert them to trainable spacy `doc` object for training (see more details below).
 
-### Edit project.yml file
+## Edit project.yml file
 The `project.yml` file provides all the command necessary to access the training configulation and the corpus file. To train each of the `ud` and `pos` pipeline with different configulation (either `trf` or `t2v`). You can change the variables in this project file. The following is the example of the variable section to train `ud` with `trf` pipeline with `L1L2e_combined` dataset.
 
 ```
@@ -41,7 +37,7 @@ vars:
 ```
 
 
-### Running preprocessing script
+## Run preprocessing script
 
 The following command converts the raw `conllu` file into spacy `doc` object for training.
 
@@ -60,7 +56,7 @@ For instance, if you set `ud`, `L1L2e_combined` in the `yml` file, the script co
 To convert other files, change the settings in `project.yml` file and run the command again.
 
 
-### Run command line
+## Run training command
 
 When you successfully converted the `.conllu` in the `asset` folder into `.spacy` in the `corpus` folder, you can run the following command to start training. Note that spacy uses `training` and `dev` data in this step.
 
@@ -71,3 +67,9 @@ python -m spacy project run all
 This will create a specific directory under `training` folder. When the training step is completed, it will also create spacy package under the `package` folder. 
 
 In the paper, we did not use `evaluate` command from spacy, but we create a separate script to evaluate the parsers accuracy using our own evaluation script.
+
+
+## TO DO list
+- [x] Add more description on this readme.
+- [ ] Check reproducibility
+- [ ] Add more description on evaluation script 
