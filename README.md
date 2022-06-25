@@ -19,9 +19,9 @@ Please follow the following steps to reproduce our result on the paper.
 Once you obtained the training corpus files in  `.connlu` format, put them under `assets/ud` and `assets/pos` respectively. Spacy project commands will recognize these `conllu` files when prompted and convert them to trainable spacy `doc` object for training (see more details below).
 
 ## Edit project.yml file
-The `project.yml` file provides all the command necessary to access the training configulation and the corpus file. To train each of the `ud` and `pos` pipeline with different configulation (either `trf` or `t2v`). You can change the variables in this project file. The following is the example of the variable section to train `ud` with `trf` pipeline with `L1L2e_combined` dataset.
+The `project.yml` file provides all the command necessary to access the training configulation and the corpus file. To train each of the `ud` and `pos` pipeline with different configulation (either `trf` or `t2v`), you can change the variables in this `project.yml` file. The following is the example of the variable section to train `ud` with `trf` pipeline with `L1L2e_combined` dataset.
 
-```
+```yml
 # Variables can be referenced across the project.yml using ${vars.var_name}
 vars:
   config: "trf" #Choose from "t2v" or "trf"; set config file each time you train model
@@ -41,7 +41,7 @@ vars:
 
 The following command converts the raw `conllu` file into spacy `doc` object for training.
 
-```
+```bash
 python -m spacy project run convert
 ```
 
@@ -60,7 +60,7 @@ To convert other files, change the settings in `project.yml` file and run the co
 
 When you successfully converted the `.conllu` in the `assets` folder into `.spacy` in the `corpus` folder, you can run the following command to start training. Note that spacy uses `training` and `dev` data in this step.
 
-```
+```bash
 python -m spacy project run all
 ```
 
