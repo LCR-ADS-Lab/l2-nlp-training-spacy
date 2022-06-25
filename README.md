@@ -24,16 +24,16 @@ The `project.yml` file provides all the command necessary to access the training
 ```yml
 # Variables can be referenced across the project.yml using ${vars.var_name}
 vars:
-  config: "trf" #Choose from "t2v" or "trf"; set config file each time you train model
-  ud_treebank: "UD_English-EWT"
-  ud_prefix: "L1L2e_combined" #dataset name: L1, L1L2_combined, L1L2e_combined
+  config: "trf" # Choose from "t2v" or "trf"; set config file each time you train model
+  ud_treebank: "UD_English-EWT" #don't change this
+  ud_prefix: "L1L2e_combined" #training dataset: choose from L1, L1L2_combined, L1L2e_combined
   pipeline: "ud" # use ud for POS + DEP; pos for POS only.
-  spacy_lang: "en" 
+  spacy_lang: "en" #don't change this
   # spacy model with vectors by name or path: "en_core_web_lg"
   # if used, switch from train to train-with-vectors
-  vectors: null
-  gpu: -1 #we don't use GPU, if you have GPU device with cuda, set 1
-  package_version: "0.0.1"
+  vectors: null 
+  gpu: -1 #we don't use GPU, if you have GPU device with cuda, set 0
+  package_version: "0.0.1" #this will be used as the final package version
 ```
 
 
