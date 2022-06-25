@@ -13,27 +13,24 @@ extract:
 convert:
   cmd: python -m spacy run convert
   script:
-    - mkdir -p corpus/UDL1L2e_combined
-    - mkdir -p corpus/UDL1L2e_combined/pos
-    - python -m spacy convert assets/pos/UDL1L2e_combined-pos-train.conllu corpus/UDL1L2e_combined/pos/
-      --converter conllu2 -n 10 -T
-    - python -m spacy convert assets/pos/UDL1L2e_combined-pos-dev.conllu corpus/UDL1L2e_combined/pos/
-      --converter conllu2 -n 10 -T
-    - python -m spacy convert assets/pos/UDL1L2e_combined-pos-test.conllu corpus/UDL1L2e_combined/pos/
-      --converter conllu2 -n 10 -T
-    - mv corpus/UDL1L2e_combined/pos/UDL1L2e_combined-pos-train.spacy corpus/UDL1L2e_combined/pos/train.spacy
-    - mv corpus/UDL1L2e_combined/pos/UDL1L2e_combined-pos-dev.spacy corpus/UDL1L2e_combined/pos/dev.spacy
-    - mv corpus/UDL1L2e_combined/pos/UDL1L2e_combined-pos-test.spacy corpus/UDL1L2e_combined/pos/test.spacy
+    - mkdir -p corpus/L1L2e_combined
+    - mkdir -p corpus/L1L2e_combined/ud
+    - python -m scripts.convert assets/ud/L1L2e_combined-ud-train.conllu -o corpus/L1L2e_combined/ud/L1L2e_combined-ud-train.spacy
+    - python -m scripts.convert assets/ud/L1L2e_combined-ud-dev.conllu -o corpus/L1L2e_combined/ud/L1L2e_combined-ud-dev.spacy
+    - python -m scripts.convert assets/ud/L1L2e_combined-ud-test.conllu -o corpus/L1L2e_combined/ud/L1L2e_combined-ud-test.spacy
+    - mv corpus/L1L2e_combined/ud/L1L2e_combined-ud-train.spacy corpus/L1L2e_combined/ud/train.spacy
+    - mv corpus/L1L2e_combined/ud/L1L2e_combined-ud-dev.spacy corpus/L1L2e_combined/ud/dev.spacy
+    - mv corpus/L1L2e_combined/ud/L1L2e_combined-ud-test.spacy corpus/L1L2e_combined/ud/test.spacy
   deps: []
   outs:
-    - path: corpus/UDL1L2e_combined/pos/train.spacy
-      md5: 8b6a71f275c3d9ff8278fefcb6102e8d
-    - path: corpus/UDL1L2e_combined/pos/dev.spacy
-      md5: 5888c9bdaa1f92292a63a25c802576c4
-    - path: corpus/UDL1L2e_combined/pos/test.spacy
-      md5: 2af30fe6378f8ed0a964797d58403643
-  spacy_version: 3.2.2
-  spacy_git_version: bbaf41fb3
+    - path: corpus/L1L2e_combined/ud/train.spacy
+      md5: f2a111f9540c38e1a34ea1c3383c969a
+    - path: corpus/L1L2e_combined/ud/dev.spacy
+      md5: ef667e382332d03133fdcbd96787eb38
+    - path: corpus/L1L2e_combined/ud/test.spacy
+      md5: 8050b572823313e123ff6066e5823dad
+  spacy_version: 3.3.1
+  spacy_git_version: 5fb597f77
 generate-config:
   cmd: python -m spacy run generate-config
   script:

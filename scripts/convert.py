@@ -1,21 +1,21 @@
 import re
+from pathlib import Path
+import typer
 
 from spacy.training.converters.conll_ner_to_docs import n_sents_info
 from spacy.training import iob_to_biluo, biluo_tags_to_spans
-from spacy.tokens import Doc, Token, Span
+from spacy.tokens import Doc, DocBin, Token, Span
 from spacy.vocab import Vocab
-from wasabi import Printer
+from wasabi import Printer, msg
 
 
-def conllu_to_docs(
-    input_data,
-    n_sents=10,
-    append_morphology=False,
-    ner_map=None,
-    merge_subtokens=False,
-    no_print=False,
-    **_
-):
+def conllu_to_docs(input_data,
+                   n_sents=10,
+                   append_morphology=False,
+                   ner_map=None,
+                   merge_subtokens=False,
+                   no_print=False,
+                   **_):
     """
     Convert conllu files into JSON format for use with train cli.
     append_morphology parameter enables appending morphology to tags, which is
@@ -192,8 +192,8 @@ def conllu_sentence_to_doc(
         morph = morph if morph != "_" else ""
         dep = "ROOT" if dep == "root" else dep
         lemmas.append(lemma)
-        poses.append('X')  # set pos automatically X
         # poses.append(pos)
+        poses.append("X")  #set pos automatically X
         tags.append(tag)
         morphs.append(morph)
         heads.append(head)
@@ -248,7 +248,9 @@ def conllu_sentence_to_doc(
         deps=deps,
         heads=heads,
     )
-    doc_x.ents = [Span(doc_x, ent.start, ent.end, label=ent.label) for ent in doc.ents]
+    doc_x.ents = [
+        Span(doc_x, ent.start, ent.end, label=ent.label) for ent in doc.ents
+    ]
 
     return doc_x
 
@@ -261,7 +263,7 @@ def merge_conllu_subtokens(lines, doc):
         id_, word, lemma, pos, tag, morph, head, dep, _1, misc = parts
         if "-" in id_:
             subtok_start, subtok_end = id_.split("-")
-            subtok_span = doc[int(subtok_start) - 1 : int(subtok_end)]
+            subtok_span = doc[int(subtok_start) - 1:int(subtok_end)]
             subtok_spans.append(subtok_span)
             # create merged tag, morph, and lemma values
             tags = []
@@ -288,11 +290,29 @@ def merge_conllu_subtokens(lines, doc):
                 token.tag_ = "_".join(tags)
                 token._.merged_morph = "|".join(sorted(morphs.values()))
                 token._.merged_spaceafter = (
-                    True if subtok_span[-1].whitespace_ else False
-                )
+                    True if subtok_span[-1].whitespace_ else False)
 
     with doc.retokenize() as retokenizer:
         for span in subtok_spans:
             retokenizer.merge(span)
 
     return doc
+
+
+def main(
+        filepath: Path = typer.Argument(..., exists=True),
+        output: Path = typer.Option(..., "-o", "--output", exists=False),
+):
+    with filepath.open("r", encoding="utf-8") as f:
+        data = f.read()
+
+    #docs = convert_iob_to_docs(data)
+    docs = conllu_to_docs(data)
+    with msg.loading(f"Saving into DocBin..."):
+        doc_bin = DocBin(docs=docs, store_user_data=True)
+        doc_bin.to_disk(output)
+        msg.good(f"Saved to {output}")
+
+
+if __name__ == "__main__":
+    typer.run(main)
