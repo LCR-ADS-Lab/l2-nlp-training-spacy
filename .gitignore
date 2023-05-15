@@ -13,3 +13,4 @@ corpus/L1L2e_combined/ud/*
 corpus/UDL1L2e_combined/pos/*
 .DS_Store
 training/*
+packages/*

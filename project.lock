@@ -45,21 +45,21 @@ generate-config:
 train:
   cmd: python -m spacy run train
   script:
-    - python -m spacy train configs/pos/t2v.cfg -o training/pos_UDL1L2e_combined_t2v
-      --gpu-id -1 --paths.train corpus/UDL1L2e_combined/pos/train.spacy --paths.dev
-      corpus/UDL1L2e_combined/pos/dev.spacy
+    - python -m spacy train configs/pos/t2v.cfg -o training/pos_L1L2e_combined_t2v
+      --gpu-id -1 --paths.train corpus/L1L2e_combined/pos/train.spacy --paths.dev
+      corpus/L1L2e_combined/pos/dev.spacy
   deps:
-    - path: corpus/UDL1L2e_combined/pos/train.spacy
-      md5: 8b6a71f275c3d9ff8278fefcb6102e8d
-    - path: corpus/UDL1L2e_combined/pos/dev.spacy
-      md5: 5888c9bdaa1f92292a63a25c802576c4
+    - path: corpus/L1L2e_combined/pos/train.spacy
+      md5: 6112c898eda1e9dd73e0a3b7bc9a3bc3
+    - path: corpus/L1L2e_combined/pos/dev.spacy
+      md5: 9f9232776a7f02713bdfe26d69fb8bb9
     - path: configs/pos/t2v.cfg
       md5: 1f66a3604f69e5785fd5982ab1b2df69
   outs:
-    - path: training/pos_UDL1L2e_combined_t2v/model-best
-      md5: c8e3307e53fbe4bc92d583b21fcb2db8
-  spacy_version: 3.2.2
-  spacy_git_version: bbaf41fb3
+    - path: training/pos_L1L2e_combined_t2v/model-best
+      md5: 2095e45ac8ad68c02a071287a6ad67ae
+  spacy_version: 3.3.1
+  spacy_git_version: 5fb597f77
 evaluate:
   cmd: python -m spacy run evaluate
   script:
@@ -78,16 +78,16 @@ evaluate:
 package:
   cmd: python -m spacy run package
   script:
-    - python -m spacy package training/pos_UDL1L2e_combined_t2v/model-best packages
-      --name pos_UDL1L2e_combined_t2v --version 0.0.1 --force
+    - python -m spacy package training/pos_L1L2e_combined_t2v/model-best packages
+      --name pos_L1L2e_combined_t2v --version 0.0.1 --force
   deps:
-    - path: training/pos_UDL1L2e_combined_t2v/model-best
-      md5: c8e3307e53fbe4bc92d583b21fcb2db8
+    - path: training/pos_L1L2e_combined_t2v/model-best
+      md5: 2095e45ac8ad68c02a071287a6ad67ae
   outs:
-    - path: packages/pos_UDL1L2e_combined_t2v-0.0.1/dist/pos_UDL1L2e_combined_t2v-0.0.1.tar.gz
+    - path: packages/pos_L1L2e_combined_t2v-0.0.1/dist/pos_L1L2e_combined_t2v-0.0.1.tar.gz
       md5: null
-  spacy_version: 3.2.2
-  spacy_git_version: bbaf41fb3
+  spacy_version: 3.3.1
+  spacy_git_version: 5fb597f77
 train-with-vectors:
   cmd: python -m spacy run train-with-vectors
   script:
